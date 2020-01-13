@@ -1,0 +1,360 @@
+swagger: '2.0'
+info:
+  description: 深大技术论坛(暂)
+  version: 1.0.0
+  title: SZUTech Back-End API
+  termsOfService: /
+  license:
+    name: SZUTech
+    url: https://github.com/GabbyYam/SZUTech
+tags:
+- name: module
+  description: 模块相关
+- name: section
+  description: 版块相关
+- name: user
+  description: 用户相关
+- name: main_thread
+  description: 主题帖相关
+- name: sub_thread
+  description: 回复帖相关
+- name: following
+  description: 用户关注列表和粉丝列表
+  
+# schemes:
+# - http
+paths:
+  /module/listModule:
+    get:
+      tags:
+      - module
+      summary: 返回所有module
+      operationId: listModule
+      responses:
+        default:
+          description: successful operation
+        200:
+          description: successful operation
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/module'
+  /section/listSection:
+    get: 
+      tags: 
+        - section
+      summary: 返回当前module的所有section
+      operationId: listSection
+      produces: 
+        - application/json
+      responses:
+        default:
+          description: successful operation
+        200:
+          description: successful operation
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/section'
+  /section/listHotSection:
+    get: 
+      tags: 
+        - section
+      summary: 返回热度前10的section
+      operationId: listHotSection
+      produces: 
+        - application/json
+      responses:
+        default:
+          description: successful operation
+        200:
+          description: successful operation
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/section'      
+  /user:
+    post:
+      tags:
+      - user
+      summary: 新增一个用户
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        description: Created user object
+        required: true
+        schema:
+          $ref: '#/definitions/User'
+      responses:
+        default:
+          description: successful operation
+        200: 
+          description: ok
+  /user/login:
+    get:
+      tags:
+      - user
+      summary: 登陆账号
+      operationId: loginUser
+      produces:
+      - application/json
+      parameters:
+      - name: username
+        in: query
+        description: 用户名/email/手机号
+        required: true
+        type: string
+      - name: password
+        in: query
+        description: 密码
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+        400:
+          description: 账号不存在或密码错误
+  /user/logout:
+    get:
+      tags:
+      - user
+      summary: 登出账号
+      operationId: logoutUser
+      produces:
+      - application/json
+      - application/xml
+      responses:
+        200:
+          description: ok
+        404:
+          description: 该用户还未登陆,无法登出
+  
+  /user/{username}:
+    get:
+      tags:
+      - user
+      summary: 查找并返回对应username的用户信息
+      operationId: getUserByName
+      produces:
+      - application/json
+      parameters:
+      - name: username
+        in: path
+        description: The name that needs to be fetched. Use user1 for testing. 
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: '#/definitions/User'
+        400:
+          description: 非法格式
+        404:
+          description: 不存在此用户
+    put:
+      tags:
+      - user
+      summary: 更新用户信息
+      description: 只有注册过的用户可以更新信息
+      operationId: updateUser
+      produces:
+      - application/json
+      parameters:
+      - name: username
+        in: path
+        description: name that need to be updated
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: Updated user object
+        required: true
+        schema:
+          $ref: '#/definitions/User'
+      responses:
+        200: 
+          description: ok
+        400:
+          description: 非法格式
+        404:
+          description: 用户不存在
+    delete:
+      tags:
+      - user
+      summary: 注销用户/软删除/封禁
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      produces:
+      - application/json
+      parameters:
+      - name: username
+        in: path
+        description: The name that needs to be deleted
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+        400:
+          description: 非法格式
+        404:
+          description: 用户不存在
+  /user/listUser:
+    get:
+      tags:
+      - user
+      summary: 返回所有用户
+      operationId: listUser
+      produces:
+      - application/json
+      responses:
+        200:
+          description: ok
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/User'
+        400:
+          description: 非法格式
+        404:
+          description: 用户不存在
+          
+          
+  /main_thread/listHotThread/{threadNumber}:
+    get:
+      tags:
+      - main_thread
+      summary: 返回包含前n个热门帖的json数组
+      operationId: listHotThread
+      produces: 
+      - application/json
+      parameters:
+        - name: threadNumber
+          in: path
+          required: true
+          type: integer
+          format: int32
+        
+      responses:
+        default:
+          description: successful operation!
+        200:
+          description: ok
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/main_thread'
+            
+  /main_thread/listLatestThread/{threadNumber}:
+    get:
+      tags:
+      - main_thread
+      summary: 返回包含前n个最新帖的json数组
+      operationId: listLatestThread
+      produces: 
+      - application/json
+      parameters:
+        - name: threadNumber
+          in: path
+          required: true
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: successful operation
+        200:
+          description: ok
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/main_thread'
+
+
+definitions:
+  module:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+    xml:
+      name: Order
+  section:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      description:
+        type: string
+    xml:
+      name: section
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      username:
+        type: string
+      email:
+        type: string
+      phone:
+        type: string
+      password:
+        type: string
+      
+    xml:
+      name: User
+  following:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+    xml:
+      name: Tag
+  main_thread:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      title: 
+        type: string
+      view:
+        type: integer
+        format: int32
+      up:
+        type: integer
+        format: int32
+  ApiResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      type:
+        type: string
+      message:
+        type: string
+# Added by API Auto Mocking Plugin
+# host: orz.com
+# basePath: /S9627/listHotSection/1.0.0
+schemes:
+ - https
+ - http
+host: localhost:8080
+basePath: /
+
